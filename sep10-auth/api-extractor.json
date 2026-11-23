@@ -40,5 +40,6 @@
       },
       "files": ["dist/index.d.ts"]
     }
-  }
+  },
+  "newlineKind": "lf"
 }
