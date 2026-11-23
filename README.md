@@ -1,6 +1,7 @@
 # compliance-adapters
 
 [![CI](https://github.com/stellar-compliance-kit/compliance-adapters/actions/workflows/ci.yml/badge.svg)](https://github.com/stellar-compliance-kit/compliance-adapters/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/stellar-compliance-kit/compliance-adapters/badge)](https://scorecard.dev/viewer/?uri=github.com/stellar-compliance-kit/compliance-adapters)
 
 Integration adapters connecting Stellar compliance primitives to SEP-10 auth, sanctions oracles, and Horizon/RPC event streams.
 
@@ -36,6 +37,20 @@ Each package has its own `README.md`, tests, and `package.json`.
 
 Runnable examples live under [`examples/`](./examples). Each is a self-contained npm workspace
 that wires the adapters together in a realistic scenario.
+
+### [`examples/sep10-browser-login`](./examples/sep10-browser-login)
+
+A Vite + vanilla TypeScript single-page app that demonstrates the **client-side**
+SEP-10 flow using the [Freighter](https://www.freighter.app/) browser wallet:
+
+1. Connect Freighter and obtain the user's Stellar public key.
+2. `GET /auth?account=<G…>` — fetch an unsigned challenge XDR from the example server.
+3. Sign the XDR in-browser via Freighter's `signTransaction()` API.
+4. `POST /auth { transaction }` — submit the signed XDR; receive a JWT.
+5. Store the JWT in `sessionStorage` and display it for use as a Bearer token.
+
+Runs against the `full-stack-demo` server (or any SEP-10-compliant API) via a
+Vite dev-server proxy. No CORS configuration required during development.
 
 ### [`examples/sep10-sanctions-gate`](./examples/sep10-sanctions-gate)
 
@@ -132,6 +147,8 @@ npx compliance-adapters sync-sanctions --dry-run --addresses ./sanctions-oracle/
 ```
 
 Run `npx compliance-adapters --help` for available commands and `npx compliance-adapters sync-sanctions --help` for command-specific options.
+
+To run sync on a schedule, see [`docs/deploy/`](./docs/deploy/README.md) for a Kubernetes CronJob and a systemd service + timer.
 
 ### Building
 
@@ -270,6 +287,8 @@ package's npm page. Requires an `NPM_TOKEN` secret, and packages must drop `"pri
 **Dry run on a fork:** enable Actions on your fork, open *Actions → Release → Run workflow*, and
 leave `dry-run` checked. The job builds, tests and runs `npm pack --dry-run` for each package
 without publishing.
+New to the Stellar ecosystem? Check the [Glossary](./docs/glossary.md) for definitions of
+common terms like StrKey, SEP-10, muxed account, ScVal, and network passphrase.
 This repo participates in the [Drips Wave](https://www.drips.network/) Stellar Program and is
 deliberately kept full of small, well-scoped issues. Open issues are labeled by complexity
 (`complexity: trivial`, `complexity: medium`, `complexity: high`) so you can pick work that
