@@ -203,6 +203,24 @@ Run `npx compliance-adapters --help` for available commands and
 
 See each package's README for its full API and configuration options.
 
+## API reference
+
+Browsable API docs generated with TypeDoc are published to GitHub Pages:
+https://stellar-compliance-kit.github.io/compliance-adapters/ (build locally with `npm run docs`, output in `docs/api`).
+
+## Public API reports
+
+Each published package (`sep10-auth`, `sanctions-oracle`, `horizon-listener`) has an
+[api-extractor](https://api-extractor.com/) report committed at `<package>/etc/<package>.api.md`.
+CI runs `npm run api:check` and fails when the exported API changes without the report being
+updated. If the change is intentional, run `npm run api:update` and commit the updated reports.
+
+## Pre-commit hooks
+
+`npm install` installs a [husky](https://typicode.github.io/husky/) pre-commit hook (via the
+`prepare` script) that runs [lint-staged](https://github.com/lint-staged/lint-staged): Prettier and
+ESLint on staged files only. Set `HUSKY=0` to skip the hooks (e.g. `HUSKY=0 git commit ...`).
+
 ## Changelog
 
 See [CHANGELOG.md](./CHANGELOG.md) for release notes and version history.
@@ -241,6 +259,17 @@ npm run release
 The release command repeats the check so a release cannot be published without a matching root
 changelog entry. Changesets will manage consistent version bumps across `sep10-auth`,
 `sanctions-oracle`, and `horizon-listener`.
+
+### Automated releases
+
+`.github/workflows/release.yml` runs after a green `CI` run on `main`. It builds, tests, then uses
+`changesets/action` to open a "version packages" PR or, once merged, publish with
+`npm publish --provenance --access public` (OIDC `id-token: write`). Provenance is shown on each
+package's npm page. Requires an `NPM_TOKEN` secret, and packages must drop `"private": true` to be published.
+
+**Dry run on a fork:** enable Actions on your fork, open *Actions → Release → Run workflow*, and
+leave `dry-run` checked. The job builds, tests and runs `npm pack --dry-run` for each package
+without publishing.
 This repo participates in the [Drips Wave](https://www.drips.network/) Stellar Program and is
 deliberately kept full of small, well-scoped issues. Open issues are labeled by complexity
 (`complexity: trivial`, `complexity: medium`, `complexity: high`) so you can pick work that
